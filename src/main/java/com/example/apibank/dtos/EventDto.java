@@ -2,14 +2,14 @@ package com.example.apibank.dtos;
 
 public class EventDto {
     private String type;
-    private Integer origin;
+    private String origin;
     private Float amount;
-    private Integer destination;
+    private String destination;
 
     public EventDto() {
     }
 
-    public EventDto(String type, Integer origin, Float amount, Integer destination) {
+    public EventDto(String type, String origin, Float amount, String destination) {
         this.type = type;
         this.origin = origin;
         this.amount = amount;
@@ -24,11 +24,11 @@ public class EventDto {
         this.type = type;
     }
 
-    public Integer getOrigin() {
+    public String getOrigin() {
         return origin;
     }
 
-    public void setOrigin(Integer origin) {
+    public void setOrigin(String origin) {
         this.origin = origin;
     }
 
@@ -40,11 +40,11 @@ public class EventDto {
         this.amount = amount;
     }
 
-    public Integer getDestination() {
+    public String getDestination() {
         return destination;
     }
 
-    public void setDestination(Integer destination) {
+    public void setDestination(String destination) {
         this.destination = destination;
     }
 }
