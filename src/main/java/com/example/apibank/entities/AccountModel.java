@@ -1,25 +1,27 @@
-package entities;
+package com.example.apibank.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity(name = "Account")
 public class AccountModel {
-    private Integer id;
+    @Id
+    private String id;
     private Float balance;
 
     public AccountModel() {
     }
 
-    public AccountModel(Integer id, Float balance) {
+    public AccountModel(String id, Float balance) {
         this.id = id;
         this.balance = balance;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
