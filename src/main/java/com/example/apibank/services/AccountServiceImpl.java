@@ -18,13 +18,18 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountRepository accountRepository;
 
-    public AccountModel transferEvent(EventDto event){
+    @Override
+    public Object transferEvent(EventDto event){
 
         switch (event.getType()){
             case "deposit":
                 return deposit(event);
             case "withdraw":
                 return withdraw(event);
+            case "transfer":
+                AccountModel deposit = deposit(event);
+                AccountModel withdraw = withdraw(event);
+                return new TransferDto(deposit,withdraw);
         }
 
         return new AccountModel();

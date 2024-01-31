@@ -5,6 +5,6 @@ import com.example.apibank.entities.AccountModel;
 
 public interface AccountService {
 
-    public AccountModel transferEvent(EventDto event);
+    public abstract Object transferEvent(EventDto event);
 
 }
