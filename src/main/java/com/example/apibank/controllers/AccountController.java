@@ -42,6 +42,12 @@ public class AccountController {
         return new TransferDto(account,account2);
     }
 
+    @GetMapping("/balance")
+    public Float balance(@RequestParam(name = "account_id") String id){
+
+        return accountService.balance(id);
+    }
+
     @PostMapping("event")
     public Object event(@RequestBody EventDto event){
 

@@ -19,6 +19,18 @@ public class AccountServiceImpl implements AccountService {
     AccountRepository accountRepository;
 
     @Override
+    public Float balance(String id){
+
+         Optional<AccountModel> account = accountRepository.findById(id);
+
+         if(account.isPresent())
+             return account.get().getBalance();
+         else
+             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");
+
+     }
+
+    @Override
     public Object transferEvent(EventDto event){
 
         switch (event.getType()){
@@ -29,7 +41,7 @@ public class AccountServiceImpl implements AccountService {
             case "transfer":
                 AccountModel deposit = deposit(event);
                 AccountModel withdraw = withdraw(event);
-                return new TransferDto(deposit,withdraw);
+                return new TransferDto(withdraw, deposit);
         }
 
         return new AccountModel();
@@ -37,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
 
     private AccountModel deposit(EventDto event){
 
-        Optional<AccountModel> account= accountRepository.findById(event.getDestination());
+        Optional<AccountModel> account = accountRepository.findById(event.getDestination());
 
         if(account.isPresent()){
 
@@ -45,15 +57,15 @@ public class AccountServiceImpl implements AccountService {
             Float balance = account.get().getBalance();
             balance += event.getAmount();
 
-            return (accountRepository.save(new AccountModel(id, balance)));
+            return accountRepository.save(new AccountModel(id, balance));
         }
         else
-            return (accountRepository.save(new AccountModel(event.getDestination(), event.getAmount())));
+            return accountRepository.save(new AccountModel(event.getDestination(), event.getAmount()));
     }
 
     private AccountModel withdraw(EventDto event){
 
-        Optional<AccountModel> account= accountRepository.findById(event.getOrigin());
+        Optional<AccountModel> account = accountRepository.findById(event.getOrigin());
 
         if(account.isPresent()){
 
@@ -61,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
             Float balance = account.get().getBalance();
             balance -= event.getAmount();
 
-            return (accountRepository.save(new AccountModel(id, balance)));
+            return accountRepository.save(new AccountModel(id, balance));
         }
         else
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");

@@ -7,4 +7,6 @@ public interface AccountService {
 
     public abstract Object transferEvent(EventDto event);
 
+    public abstract Float balance(String id);
+
 }
