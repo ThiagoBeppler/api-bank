@@ -7,6 +7,7 @@ import com.example.apibank.entities.AccountModel;
 import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,7 +43,7 @@ public class AccountController {
         return new TransferDto(account,account2);
     }
 
-    @GetMapping("/balance")
+    @GetMapping("balance")
     public Float balance(@RequestParam(name = "account_id") String id){
 
         return accountService.balance(id);
@@ -52,5 +53,13 @@ public class AccountController {
     public Object event(@RequestBody EventDto event){
 
         return accountService.transferEvent(event);
+    }
+
+    @PostMapping("reset")
+    public HttpStatus reset(){
+
+        accountService.reset();
+
+        return HttpStatus.OK;
     }
 }

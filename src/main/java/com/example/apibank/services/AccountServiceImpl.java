@@ -47,6 +47,12 @@ public class AccountServiceImpl implements AccountService {
         return new AccountModel();
     }
 
+    @Override
+    public void reset(){
+
+        accountRepository.deleteAll();
+    }
+
     private AccountModel deposit(EventDto event){
 
         Optional<AccountModel> account = accountRepository.findById(event.getDestination());
