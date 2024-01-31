@@ -6,7 +6,9 @@ import com.example.apibank.entities.AccountModel;
 import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -21,6 +23,8 @@ public class AccountServiceImpl implements AccountService {
         switch (event.getType()){
             case "deposit":
                 return deposit(event);
+            case "withdraw":
+                return withdraw(event);
         }
 
         return new AccountModel();
@@ -40,5 +44,21 @@ public class AccountServiceImpl implements AccountService {
         }
         else
             return (accountRepository.save(new AccountModel(event.getDestination(), event.getAmount())));
+    }
+
+    private AccountModel withdraw(EventDto event){
+
+        Optional<AccountModel> account= accountRepository.findById(event.getOrigin());
+
+        if(account.isPresent()){
+
+            String id = account.get().getId();
+            Float balance = account.get().getBalance();
+            balance -= event.getAmount();
+
+            return (accountRepository.save(new AccountModel(id, balance)));
+        }
+        else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");
     }
 }
