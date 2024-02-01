@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("")
 public class AccountController {
 
     @Autowired
@@ -50,6 +50,7 @@ public class AccountController {
     }
 
     @PostMapping("event")
+    @ResponseStatus(HttpStatus.CREATED)
     public Object event(@RequestBody EventDto event){
 
         return accountService.transferEvent(event);

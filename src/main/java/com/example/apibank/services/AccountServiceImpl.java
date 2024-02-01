@@ -1,6 +1,8 @@
 package com.example.apibank.services;
 
+import com.example.apibank.dtos.DestinationDto;
 import com.example.apibank.dtos.EventDto;
+import com.example.apibank.dtos.OriginDto;
 import com.example.apibank.dtos.TransferDto;
 import com.example.apibank.entities.AccountModel;
 import com.example.apibank.interfaces.AccountService;
@@ -27,7 +29,6 @@ public class AccountServiceImpl implements AccountService {
              return account.get().getBalance();
          else
              throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");
-
      }
 
     @Override
@@ -35,13 +36,13 @@ public class AccountServiceImpl implements AccountService {
 
         switch (event.getType()){
             case "deposit":
-                return deposit(event);
+                return new DestinationDto(deposit(event));
             case "withdraw":
-                return withdraw(event);
+                return new OriginDto(withdraw(event));
             case "transfer":
-                AccountModel deposit = deposit(event);
-                AccountModel withdraw = withdraw(event);
-                return new TransferDto(withdraw, deposit);
+                AccountModel depositTransfer = deposit(event);
+                AccountModel withdrawTransfer = withdraw(event);
+                return new TransferDto(withdrawTransfer, depositTransfer);
         }
 
         return new AccountModel();
