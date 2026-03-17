@@ -8,6 +8,7 @@ import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -56,11 +57,9 @@ public class AccountController {
         return accountService.transferEvent(event);
     }
 
-    @PostMapping("reset")
-    public HttpStatus reset(){
-
+    @PostMapping("/reset")
+    public ResponseEntity<String> reset() {
         accountService.reset();
-
-        return HttpStatus.OK;
+        return ResponseEntity.ok("OK");
     }
 }
