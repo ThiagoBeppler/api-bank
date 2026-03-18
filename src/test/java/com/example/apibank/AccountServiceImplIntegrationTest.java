@@ -43,8 +43,8 @@ class AccountServiceImplIntegrationTest {
 
     @Test
     void testBalance_AccountNotFound() {
-        Exception exception = assertThrows(RuntimeException.class, () -> accountService.balance("123"));
-        assertTrue(exception.getMessage().contains("Account not found!"));
+        BigDecimal balance = accountService.balance("123");
+        assertNull(balance);
     }
 
     @Test

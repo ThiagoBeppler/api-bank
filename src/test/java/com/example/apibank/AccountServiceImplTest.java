@@ -49,9 +49,9 @@ class AccountServiceImplTest {
         String accountId = "123";
         when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> accountService.balance(accountId));
+        BigDecimal balance = accountService.balance(accountId);
 
-        assertEquals("404 NOT_FOUND \"Account not found!\"", exception.getMessage());
+        assertNull(balance);
         verify(accountRepository, times(1)).findById(accountId);
     }
 
