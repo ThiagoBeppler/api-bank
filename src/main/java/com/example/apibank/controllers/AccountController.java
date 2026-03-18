@@ -5,9 +5,9 @@ import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.interfaces.EventResponse;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 
@@ -23,29 +23,13 @@ public class AccountController {
 
     @GetMapping("/balance")
     public ResponseEntity<BigDecimal> balance(@RequestParam(name = "account_id") String id){
-
-        BigDecimal balance = accountService.balance(id);
-
-        if (balance == null)
-            return ResponseEntity.status(404).body(new BigDecimal("0"));
-
-        return ResponseEntity.ok(balance);
+        return ResponseEntity.ok(accountService.balance(id));
     }
 
     @PostMapping("/event")
-    public ResponseEntity<?> event(@RequestBody EventDto event) {
-
-        try {
-            EventResponse response = accountService.transferEvent(event);
-            return ResponseEntity.status(201).body(response);
-        } catch (ResponseStatusException e) {
-
-            if (e.getStatusCode().value() == 404)
-                return ResponseEntity.status(404).body(new BigDecimal("0"));
-
-            throw new ResponseStatusException(e.getStatusCode(), e.getReason());
-        }
-
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventResponse event(@RequestBody EventDto event) {
+        return accountService.transferEvent(event);
     }
 
     @PostMapping("/reset")

@@ -5,6 +5,7 @@ import com.example.apibank.dtos.EventDto;
 import com.example.apibank.dtos.OriginDto;
 import com.example.apibank.dtos.TransferDto;
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.exceptions.AccountNotFoundException;
 import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.interfaces.EventResponse;
 import com.example.apibank.repositories.AccountRepository;
@@ -28,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
 
          Optional<AccountModel> account = accountRepository.findById(id);
 
-        return account.map(AccountModel::getBalance).orElse(null);
+        return account.map(AccountModel::getBalance).orElseThrow(AccountNotFoundException::new);
      }
 
     @Override
@@ -69,7 +70,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountModel withdraw(EventDto event){
 
         AccountModel account = accountRepository.findById(event.getOrigin())
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!"));
+                .orElseThrow(AccountNotFoundException::new);
 
         account.debit(event.getAmount());
 
