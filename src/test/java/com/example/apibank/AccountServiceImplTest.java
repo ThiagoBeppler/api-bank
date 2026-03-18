@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,12 +33,14 @@ class AccountServiceImplTest {
     @Test
     void testBalance_AccountExists() {
         String accountId = "123";
-        AccountModel account = new AccountModel(accountId, 100.0f);
+        AccountModel account = new AccountModel(accountId);
+        account.credit((new BigDecimal("100.00")));
+
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
 
-        Float balance = accountService.balance(accountId);
+        BigDecimal balance = accountService.balance(accountId);
 
-        assertEquals(100.0f, balance);
+        assertEquals(new BigDecimal("100.00"), balance);
         verify(accountRepository, times(1)).findById(accountId);
     }
 
@@ -54,10 +57,15 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Deposit() {
-        EventDto event = new EventDto("deposit", null, 50.0f, "123");
-        AccountModel account = new AccountModel("123", 100.0f);
+        EventDto event = new EventDto("deposit", null, new BigDecimal("50.00"), "123");
+        AccountModel account = new AccountModel("123");
+        account.credit(new BigDecimal("100.00"));
         when(accountRepository.findById("123")).thenReturn(Optional.of(account));
-        when(accountRepository.save(any(AccountModel.class))).thenReturn(new AccountModel("123", 150.0f));
+
+        AccountModel mockAccount = new AccountModel("123");
+        mockAccount.credit(new BigDecimal("150.00"));
+
+        when(accountRepository.save(any(AccountModel.class))).thenReturn(mockAccount);
 
         Object result = accountService.transferEvent(event);
 
@@ -68,10 +76,15 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Withdraw() {
-        EventDto event = new EventDto("withdraw", "123", 50.0f, null);
-        AccountModel account = new AccountModel("123", 100.0f);
+        EventDto event = new EventDto("withdraw", "123", new BigDecimal("50.00"), null);
+        AccountModel account = new AccountModel("123");
+        account.credit(new BigDecimal("100.00"));
         when(accountRepository.findById("123")).thenReturn(Optional.of(account));
-        when(accountRepository.save(any(AccountModel.class))).thenReturn(new AccountModel("123", 50.0f));
+
+        AccountModel mockAccount = new AccountModel("123");
+        mockAccount.credit(new BigDecimal("50.00"));
+
+        when(accountRepository.save(any(AccountModel.class))).thenReturn(mockAccount);
 
         Object result = accountService.transferEvent(event);
 
@@ -82,12 +95,22 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Transfer() {
-        EventDto event = new EventDto("transfer", "123", 50.0f, "456");
-        AccountModel originAccount = new AccountModel("123", 100.0f);
-        AccountModel destinationAccount = new AccountModel("456", 200.0f);
+        EventDto event = new EventDto("transfer", "123", new BigDecimal("50.00"), "456");
+        AccountModel originAccount = new AccountModel("123");
+        originAccount.credit(new BigDecimal("100.00"));
+        AccountModel destinationAccount = new AccountModel("456");
+        destinationAccount.credit(new BigDecimal("200.00"));
+
         when(accountRepository.findById("123")).thenReturn(Optional.of(originAccount));
         when(accountRepository.findById("456")).thenReturn(Optional.of(destinationAccount));
-        when(accountRepository.save(any(AccountModel.class))).thenReturn(new AccountModel("123", 50.0f), new AccountModel("456", 250.0f));
+
+        AccountModel mockOriginAccount = new AccountModel("123");
+        mockOriginAccount.credit(new BigDecimal("50.00"));
+
+        AccountModel mockDestinationAccount = new AccountModel("123");
+        mockDestinationAccount.credit(new BigDecimal("50.00"));
+
+        when(accountRepository.save(any(AccountModel.class))).thenReturn(mockOriginAccount, mockDestinationAccount);
 
         Object result = accountService.transferEvent(event);
 

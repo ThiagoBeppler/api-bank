@@ -76,6 +76,5 @@ public class AccountServiceImpl implements AccountService {
         account.debit(event.getAmount());
 
         return accountRepository.save(account);
-
     }
 }

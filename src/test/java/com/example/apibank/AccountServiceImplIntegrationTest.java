@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -29,12 +31,14 @@ class AccountServiceImplIntegrationTest {
 
     @Test
     void testBalance_AccountExists() {
-        AccountModel account = new AccountModel("123", 100.0f);
+        AccountModel account = new AccountModel("123");
+        account.credit(new BigDecimal ("100.00"));
+
         accountRepository.save(account);
 
-        Float balance = accountService.balance("123");
+        BigDecimal balance = accountService.balance("123");
 
-        assertEquals(100.0f, balance);
+        assertEquals(new BigDecimal("100.00"), balance);
     }
 
     @Test
@@ -45,52 +49,58 @@ class AccountServiceImplIntegrationTest {
 
     @Test
     void testTransferEvent_Deposit() {
-        EventDto event = new EventDto("deposit", null, 50.0f, "123");
+        EventDto event = new EventDto("deposit", null, new BigDecimal("50.00"), "123");
 
         Object result = accountService.transferEvent(event);
 
         AccountModel account = accountRepository.findById("123").orElseThrow();
-        assertEquals(50.0f, account.getBalance());
+        assertEquals(new BigDecimal("50.00"), account.getBalance());
         assertNotNull(result);
     }
 
     @Test
     void testTransferEvent_Withdraw() {
-        AccountModel account = new AccountModel("123", 100.0f);
+        AccountModel account = new AccountModel("123");
+        account.credit(new BigDecimal ("100.00"));
+
         accountRepository.save(account);
 
-        EventDto event = new EventDto("withdraw", "123", 50.0f, null);
+        EventDto event = new EventDto("withdraw", "123", new BigDecimal("50.00"), null);
 
         Object result = accountService.transferEvent(event);
 
         AccountModel updatedAccount = accountRepository.findById("123").orElseThrow();
-        assertEquals(50.0f, updatedAccount.getBalance());
+        assertEquals(new BigDecimal("50.00"), updatedAccount.getBalance());
         assertNotNull(result);
     }
 
     @Test
     void testTransferEvent_Transfer() {
-        AccountModel origin = new AccountModel("123", 100.0f);
-        AccountModel destination = new AccountModel("456", 200.0f);
+        AccountModel origin = new AccountModel("123");
+        origin.credit(new BigDecimal ("100.00"));
+
+        AccountModel destination = new AccountModel("456");
+        destination.credit(new BigDecimal ("200.00"));
+
         accountRepository.save(origin);
         accountRepository.save(destination);
 
-        EventDto event = new EventDto("transfer", "123", 50.0f, "456");
+        EventDto event = new EventDto("transfer", "123", new BigDecimal("50.00"), "456");
 
         Object result = accountService.transferEvent(event);
 
         AccountModel updatedOrigin = accountRepository.findById("123").orElseThrow();
         AccountModel updatedDestination = accountRepository.findById("456").orElseThrow();
 
-        assertEquals(50.0f, updatedOrigin.getBalance());
-        assertEquals(250.0f, updatedDestination.getBalance());
+        assertEquals(new BigDecimal("50.00"), updatedOrigin.getBalance());
+        assertEquals(new BigDecimal("250.00"), updatedDestination.getBalance());
         assertNotNull(result);
     }
 
     @Test
     void testReset() {
-        accountRepository.save(new AccountModel("123", 100.0f));
-        accountRepository.save(new AccountModel("456", 200.0f));
+        accountRepository.save(new AccountModel("123"));
+        accountRepository.save(new AccountModel("456"));
 
         accountService.reset();
 
