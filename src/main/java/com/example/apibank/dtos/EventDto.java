@@ -1,15 +1,17 @@
 package com.example.apibank.dtos;
 
+import java.math.BigDecimal;
+
 public class EventDto {
     private String type;
     private String origin;
-    private Float amount;
+    private BigDecimal amount;
     private String destination;
 
     public EventDto() {
     }
 
-    public EventDto(String type, String origin, Float amount, String destination) {
+    public EventDto(String type, String origin, BigDecimal amount, String destination) {
         this.type = type;
         this.origin = origin;
         this.amount = amount;
@@ -32,11 +34,11 @@ public class EventDto {
         this.origin = origin;
     }
 
-    public Float getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Float amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

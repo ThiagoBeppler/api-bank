@@ -3,33 +3,54 @@ package com.example.apibank.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-@Entity(name = "Account")
+import java.math.BigDecimal;
+
+@Entity
 public class AccountModel {
+
     @Id
     private String id;
-    private Float balance;
 
-    public AccountModel() {
+    private BigDecimal balance;
+
+    protected AccountModel() {}
+
+    public AccountModel(String id) {
+        this.id = id;
+        this.balance = BigDecimal.ZERO;
     }
 
-    public AccountModel(String id, Float balance) {
+    public void Account(String id) {
         this.id = id;
-        this.balance = balance;
+        this.balance = BigDecimal.ZERO;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void credit(BigDecimal amount) {
+        validateAmount(amount);
+        this.balance = this.balance.add(amount);
     }
 
-    public Float getBalance() {
-        return balance;
+    public void debit(BigDecimal amount) {
+        validateAmount(amount);
+
+        if (this.balance.compareTo(amount) < 0) {
+            throw new RuntimeException("Insufficient balance");
+        }
+
+        this.balance = this.balance.subtract(amount);
     }
 
-    public void setBalance(Float balance) {
-        this.balance = balance;
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0) {
+            throw new RuntimeException("Invalid amount");
+        }
     }
 }

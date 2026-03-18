@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -22,7 +23,7 @@ public class AccountServiceImpl implements AccountService {
     AccountRepository accountRepository;
 
     @Override
-    public Float balance(String id){
+    public BigDecimal balance(String id){
 
          Optional<AccountModel> account = accountRepository.findById(id);
 
@@ -45,9 +46,9 @@ public class AccountServiceImpl implements AccountService {
                 AccountModel depositTransfer = deposit(event);
                 AccountModel withdrawTransfer = withdraw(event);
                 return new TransferDto(withdrawTransfer, depositTransfer);
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid event type!");
         }
-
-        return new AccountModel();
     }
 
     @Override
@@ -58,33 +59,23 @@ public class AccountServiceImpl implements AccountService {
 
     private AccountModel deposit(EventDto event){
 
-        Optional<AccountModel> account = accountRepository.findById(event.getDestination());
+        AccountModel account = accountRepository.findById(event.getDestination())
+                .orElseGet(() -> new AccountModel(event.getDestination()));
 
-        if(account.isPresent()){
+        account.credit(event.getAmount());
 
-            String id = account.get().getId();
-            Float balance = account.get().getBalance();
-            balance += event.getAmount();
 
-            return accountRepository.save(new AccountModel(id, balance));
-        }
-        else
-            return accountRepository.save(new AccountModel(event.getDestination(), event.getAmount()));
+        return accountRepository.save(account);
     }
 
     private AccountModel withdraw(EventDto event){
 
-        Optional<AccountModel> account = accountRepository.findById(event.getOrigin());
+        AccountModel account = accountRepository.findById(event.getOrigin())
+                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!"));
 
-        if(account.isPresent()){
+        account.debit(event.getAmount());
 
-            String id = account.get().getId();
-            Float balance = account.get().getBalance();
-            balance -= event.getAmount();
+        return accountRepository.save(account);
 
-            return accountRepository.save(new AccountModel(id, balance));
-        }
-        else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");
     }
 }
