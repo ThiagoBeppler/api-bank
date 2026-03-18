@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 
 public interface AccountService {
 
-    public abstract Object transferEvent(EventDto event);
+    public abstract EventResponse transferEvent(EventDto event);
 
     public abstract BigDecimal balance(String id);
 

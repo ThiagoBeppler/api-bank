@@ -6,6 +6,7 @@ import com.example.apibank.dtos.OriginDto;
 import com.example.apibank.dtos.TransferDto;
 import com.example.apibank.entities.AccountModel;
 import com.example.apibank.interfaces.AccountService;
+import com.example.apibank.interfaces.EventResponse;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +36,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public Object transferEvent(EventDto event){
+    public EventResponse transferEvent(EventDto event){
 
         switch (event.getType()){
             case "deposit":
@@ -43,8 +44,8 @@ public class AccountServiceImpl implements AccountService {
             case "withdraw":
                 return new OriginDto(withdraw(event));
             case "transfer":
-                AccountModel depositTransfer = deposit(event);
                 AccountModel withdrawTransfer = withdraw(event);
+                AccountModel depositTransfer = deposit(event);
                 return new TransferDto(withdrawTransfer, depositTransfer);
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid event type!");

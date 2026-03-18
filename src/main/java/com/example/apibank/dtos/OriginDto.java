@@ -1,8 +1,9 @@
 package com.example.apibank.dtos;
 
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.interfaces.EventResponse;
 
-public class OriginDto {
+public class OriginDto implements EventResponse {
     AccountModel origin;
 
     public OriginDto() {
