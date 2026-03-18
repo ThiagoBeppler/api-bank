@@ -28,10 +28,7 @@ public class AccountServiceImpl implements AccountService {
 
          Optional<AccountModel> account = accountRepository.findById(id);
 
-         if(account.isPresent())
-             return account.get().getBalance();
-         else
-             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found!");
+        return account.map(AccountModel::getBalance).orElse(null);
      }
 
     @Override
