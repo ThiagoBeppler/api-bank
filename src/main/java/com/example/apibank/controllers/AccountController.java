@@ -39,7 +39,11 @@ public class AccountController {
             EventResponse response = accountService.transferEvent(event);
             return ResponseEntity.status(201).body(response);
         } catch (ResponseStatusException e) {
-            return ResponseEntity.status(404).body(new BigDecimal("0"));
+
+            if (e.getStatusCode().value() == 404)
+                return ResponseEntity.status(404).body(new BigDecimal("0"));
+
+            throw new ResponseStatusException(e.getStatusCode(), e.getReason());
         }
 
     }
