@@ -2,6 +2,7 @@ package com.example.apibank.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import org.springframework.data.annotation.Version;
 
 import java.math.BigDecimal;
 
@@ -12,6 +13,9 @@ public class AccountModel {
     private String id;
 
     private BigDecimal balance;
+
+    @Version
+    private Long version;
 
     protected AccountModel() {}
 
