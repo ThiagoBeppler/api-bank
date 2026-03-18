@@ -2,6 +2,7 @@ package com.example.apibank;
 
 import com.example.apibank.dtos.EventDto;
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.exceptions.AccountNotFoundException;
 import com.example.apibank.repositories.AccountRepository;
 import com.example.apibank.services.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,8 +44,10 @@ class AccountServiceImplIntegrationTest {
 
     @Test
     void testBalance_AccountNotFound() {
-        BigDecimal balance = accountService.balance("123");
-        assertNull(balance);
+
+        Exception exception = assertThrows(AccountNotFoundException.class, () -> accountService.balance("123"));
+        assertTrue(exception.getMessage().contains("Account not found!"));
+
     }
 
     @Test

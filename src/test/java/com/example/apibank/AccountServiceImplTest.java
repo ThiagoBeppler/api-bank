@@ -2,6 +2,7 @@ package com.example.apibank;
 
 import com.example.apibank.dtos.EventDto;
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.exceptions.AccountNotFoundException;
 import com.example.apibank.repositories.AccountRepository;
 import com.example.apibank.services.AccountServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -49,9 +49,9 @@ class AccountServiceImplTest {
         String accountId = "123";
         when(accountRepository.findById(accountId)).thenReturn(Optional.empty());
 
-        BigDecimal balance = accountService.balance(accountId);
+        AccountNotFoundException exception = assertThrows(AccountNotFoundException.class, () -> accountService.balance(accountId));
 
-        assertNull(balance);
+        assertEquals("Account not found!", exception.getMessage());
         verify(accountRepository, times(1)).findById(accountId);
     }
 

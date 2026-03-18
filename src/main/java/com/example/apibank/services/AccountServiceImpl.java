@@ -29,7 +29,8 @@ public class AccountServiceImpl implements AccountService {
 
          Optional<AccountModel> account = accountRepository.findById(id);
 
-        return account.map(AccountModel::getBalance).orElseThrow(AccountNotFoundException::new);
+        return account.map(AccountModel::getBalance)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found!"));
      }
 
     @Override
@@ -70,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountModel withdraw(EventDto event){
 
         AccountModel account = accountRepository.findById(event.getOrigin())
-                .orElseThrow(AccountNotFoundException::new);
+                .orElseThrow(() -> new AccountNotFoundException("Account not found!"));
 
         account.debit(event.getAmount());
 
