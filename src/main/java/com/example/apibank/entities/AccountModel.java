@@ -24,11 +24,6 @@ public class AccountModel {
         this.balance = BigDecimal.ZERO;
     }
 
-    public void Account(String id) {
-        this.id = id;
-        this.balance = BigDecimal.ZERO;
-    }
-
     public BigDecimal getBalance() {
         return balance;
     }
