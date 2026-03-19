@@ -2,6 +2,7 @@ package com.example.apibank;
 
 import com.example.apibank.dtos.EventDto;
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.enus.EventType;
 import com.example.apibank.exceptions.AccountNotFoundException;
 import com.example.apibank.repositories.AccountRepository;
 import com.example.apibank.services.AccountServiceImpl;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,7 +54,7 @@ class AccountServiceImplIntegrationTest {
 
     @Test
     void testTransferEvent_Deposit() {
-        EventDto event = new EventDto("deposit", null, new BigDecimal("50.00"), "123");
+        EventDto event = new EventDto(EventType.DEPOSIT, null, new BigDecimal("50.00"), "123");
 
         Object result = accountService.transferEvent(event);
 
@@ -68,7 +70,7 @@ class AccountServiceImplIntegrationTest {
 
         accountRepository.save(account);
 
-        EventDto event = new EventDto("withdraw", "123", new BigDecimal("50.00"), null);
+        EventDto event = new EventDto(EventType.WITHDRAW, "123", new BigDecimal("50.00"), null);
 
         Object result = accountService.transferEvent(event);
 
@@ -85,10 +87,9 @@ class AccountServiceImplIntegrationTest {
         AccountModel destination = new AccountModel("456");
         destination.credit(new BigDecimal ("200.00"));
 
-        accountRepository.save(origin);
-        accountRepository.save(destination);
+        accountRepository.saveAll(List.of(origin, destination));
 
-        EventDto event = new EventDto("transfer", "123", new BigDecimal("50.00"), "456");
+        EventDto event = new EventDto(EventType.TRANSFER, "123", new BigDecimal("50.00"), "456");
 
         Object result = accountService.transferEvent(event);
 

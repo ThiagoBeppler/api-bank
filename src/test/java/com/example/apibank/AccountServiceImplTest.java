@@ -2,6 +2,7 @@ package com.example.apibank;
 
 import com.example.apibank.dtos.EventDto;
 import com.example.apibank.entities.AccountModel;
+import com.example.apibank.enus.EventType;
 import com.example.apibank.exceptions.AccountNotFoundException;
 import com.example.apibank.repositories.AccountRepository;
 import com.example.apibank.services.AccountServiceImpl;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,7 +59,7 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Deposit() {
-        EventDto event = new EventDto("deposit", null, new BigDecimal("50.00"), "123");
+        EventDto event = new EventDto(EventType.DEPOSIT, null, new BigDecimal("50.00"), "123");
         AccountModel account = new AccountModel("123");
         account.credit(new BigDecimal("100.00"));
         when(accountRepository.findById("123")).thenReturn(Optional.of(account));
@@ -76,7 +78,7 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Withdraw() {
-        EventDto event = new EventDto("withdraw", "123", new BigDecimal("50.00"), null);
+        EventDto event = new EventDto(EventType.WITHDRAW, "123", new BigDecimal("50.00"), null);
         AccountModel account = new AccountModel("123");
         account.credit(new BigDecimal("100.00"));
         when(accountRepository.findById("123")).thenReturn(Optional.of(account));
@@ -95,7 +97,7 @@ class AccountServiceImplTest {
 
     @Test
     void testTransferEvent_Transfer() {
-        EventDto event = new EventDto("transfer", "123", new BigDecimal("50.00"), "456");
+        EventDto event = new EventDto(EventType.TRANSFER, "123", new BigDecimal("50.00"), "456");
         AccountModel originAccount = new AccountModel("123");
         originAccount.credit(new BigDecimal("100.00"));
         AccountModel destinationAccount = new AccountModel("456");
@@ -110,13 +112,13 @@ class AccountServiceImplTest {
         AccountModel mockDestinationAccount = new AccountModel("123");
         mockDestinationAccount.credit(new BigDecimal("50.00"));
 
-        when(accountRepository.save(any(AccountModel.class))).thenReturn(mockOriginAccount, mockDestinationAccount);
+        when(accountRepository.saveAll(any())).thenReturn(List.of(mockOriginAccount, mockDestinationAccount));
 
         Object result = accountService.transferEvent(event);
 
         assertNotNull(result);
         verify(accountRepository, times(2)).findById(anyString());
-        verify(accountRepository, times(2)).save(any(AccountModel.class));
+        verify(accountRepository, times(1)).saveAll(any());
     }
 
     @Test

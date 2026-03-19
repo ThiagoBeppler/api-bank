@@ -3,7 +3,6 @@ package com.example.apibank.controllers;
 import com.example.apibank.dtos.EventDto;
 import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.interfaces.EventResponse;
-import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +13,6 @@ import java.math.BigDecimal;
 @RestController
 @RequestMapping("")
 public class AccountController {
-
-    @Autowired
-    AccountRepository accountRepository;
 
     @Autowired
     AccountService accountService;
