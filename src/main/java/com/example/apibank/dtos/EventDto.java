@@ -1,9 +1,11 @@
 package com.example.apibank.dtos;
 
+import com.example.apibank.enus.EventType;
+
 import java.math.BigDecimal;
 
 public class EventDto {
-    private String type;
+    private EventType type;
     private String origin;
     private BigDecimal amount;
     private String destination;
@@ -11,18 +13,18 @@ public class EventDto {
     public EventDto() {
     }
 
-    public EventDto(String type, String origin, BigDecimal amount, String destination) {
+    public EventDto(EventType type, String origin, BigDecimal amount, String destination) {
         this.type = type;
         this.origin = origin;
         this.amount = amount;
         this.destination = destination;
     }
 
-    public String getType() {
+    public EventType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EventType type) {
         this.type = type;
     }
 

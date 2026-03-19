@@ -10,12 +10,11 @@ import com.example.apibank.interfaces.AccountService;
 import com.example.apibank.interfaces.EventResponse;
 import com.example.apibank.repositories.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,18 +36,11 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public EventResponse transferEvent(EventDto event){
 
-        switch (event.getType()){
-            case "deposit":
-                return new DestinationDto(deposit(event));
-            case "withdraw":
-                return new OriginDto(withdraw(event));
-            case "transfer":
-                AccountModel withdrawTransfer = withdraw(event);
-                AccountModel depositTransfer = deposit(event);
-                return new TransferDto(withdrawTransfer, depositTransfer);
-            default:
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid event type!");
-        }
+        return switch (event.getType()) {
+            case DEPOSIT -> deposit(event);
+            case WITHDRAW -> withdraw(event);
+            case TRANSFER -> transfer(event);
+        };
     }
 
     @Override
@@ -57,7 +49,7 @@ public class AccountServiceImpl implements AccountService {
         accountRepository.deleteAll();
     }
 
-    private AccountModel deposit(EventDto event){
+    private EventResponse deposit(EventDto event){
 
         AccountModel account = accountRepository.findById(event.getDestination())
                 .orElseGet(() -> new AccountModel(event.getDestination()));
@@ -65,16 +57,34 @@ public class AccountServiceImpl implements AccountService {
         account.credit(event.getAmount());
 
 
-        return accountRepository.save(account);
+        return new DestinationDto(accountRepository.save(account));
     }
 
-    private AccountModel withdraw(EventDto event){
+    private EventResponse withdraw(EventDto event){
 
         AccountModel account = accountRepository.findById(event.getOrigin())
                 .orElseThrow(() -> new AccountNotFoundException("Account not found!"));
 
         account.debit(event.getAmount());
 
-        return accountRepository.save(account);
+        return new OriginDto(accountRepository.save(account));
+    }
+
+    public TransferDto transfer(EventDto event) {
+
+        AccountModel origin = accountRepository.findById(event.getOrigin())
+                .orElseThrow(() -> new AccountNotFoundException("Account not found!"));
+
+        AccountModel destination = accountRepository.findById(event.getDestination())
+                .orElseGet(() -> new AccountModel(event.getDestination()));
+
+        BigDecimal amount = event.getAmount();
+
+        origin.debit(amount);
+        destination.credit(amount);
+
+        accountRepository.saveAll(List.of(origin, destination));
+
+        return new TransferDto(origin, destination);
     }
 }
